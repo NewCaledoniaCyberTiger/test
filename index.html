@@ -90,16 +90,6 @@
             margin: 16px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        #roomCode {
-            font-size: 32px;
-            font-weight: bold;
-            padding: 15px;
-            background-color: #f1f8ff;
-            border: 2px dashed #4285f4;
-            display: inline-block;
-            margin: 15px;
-            border-radius: 8px;
-        }
         #recordingIndicator {
             display: none;
             color: #34a853;
@@ -214,10 +204,26 @@
             letter-spacing: 8px;
             margin: 20px 0;
         }
+        #permissionButtonDiv {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div id="setup" class="section">
+    <div id="permissionButtonDiv">
+        <h2>마이크 권한이 필요합니다</h2>
+        <p>음성 인식을 사용하기 위해서는 마이크 사용 권한이 필요합니다.</p>
+        <p>아래 버튼을 클릭하여 마이크 권한을 허용해주세요.</p>
+        <button id="startPermissionBtn" style="padding: 15px 30px; font-size: 18px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">마이크 권한 요청하기</button>
+    </div>
+
+    <div id="setup" class="section" style="display:none;">
         <h1>음성 인식 메시지 전송 시스템</h1>
         <div style="margin: 20px 0;">
             <button id="createBtn" class="btn" onclick="createRoom()">화면 표시 모드<br>(컴퓨터)</button>
@@ -227,7 +233,7 @@
     
     <div id="roomCodeDisplay" class="section" style="display:none;">
         <h1>간편 코드</h1>
-        <div id="easyCode">1234</div>
+        <div id="easyCode">0000</div>
         <p>이 코드를 휴대폰에 입력하세요</p>
     </div>
     
@@ -285,9 +291,10 @@
         <div id="chromeSteps" style="display:none;">
             <p>Chrome에서 마이크 권한 허용하기:</p>
             <ol class="steps">
-                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
-                <li>메뉴에서 <strong>사이트 설정</strong>을 탭하세요</li>
-                <li><strong>마이크</strong> 항목을 찾아 <strong>허용</strong>으로 변경하세요</li>
+                <li>화면 상단의 주소창 오른쪽에 있는 <strong>⋮</strong> (세로 점 세 개) 메뉴를 탭하세요</li>
+                <li><strong>설정</strong>을 탭하세요</li>
+                <li><strong>사이트 설정</strong>을 탭하세요</li>
+                <li><strong>마이크</strong>를 탭하고 현재 사이트를 허용으로 설정하세요</li>
                 <li>페이지를 새로고침하세요</li>
             </ol>
         </div>
@@ -295,7 +302,7 @@
         <div id="safariSteps" style="display:none;">
             <p>Safari에서 마이크 권한 허용하기:</p>
             <ol class="steps">
-                <li><strong>설정</strong> 앱을 열고 <strong>Safari</strong>를 찾으세요</li>
+                <li>폰의 <strong>설정</strong> 앱을 열고 <strong>Safari</strong>를 찾으세요</li>
                 <li><strong>카메라 및 마이크 접근</strong>을 허용하세요</li>
                 <li>페이지를 새로고침하세요</li>
             </ol>
@@ -304,8 +311,8 @@
         <div id="firefoxSteps" style="display:none;">
             <p>Firefox에서 마이크 권한 허용하기:</p>
             <ol class="steps">
-                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
-                <li><strong>더 보기</strong>를 탭하고 <strong>권한</strong>을 선택하세요</li>
+                <li>주소창 옆의 <strong>메뉴 버튼</strong>을 탭하세요</li>
+                <li><strong>사이트 설정</strong> 또는 <strong>권한</strong>을 탭하세요</li>
                 <li><strong>마이크</strong> 옵션을 <strong>허용</strong>으로 변경하세요</li>
                 <li>페이지를 새로고침하세요</li>
             </ol>
@@ -324,7 +331,8 @@
         <div id="edgeSteps" style="display:none;">
             <p>Edge에서 마이크 권한 허용하기:</p>
             <ol class="steps">
-                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
+                <li>주소창 오른쪽의 <strong>...</strong> 메뉴를 탭하세요</li>
+                <li><strong>설정</strong>을 탭하세요</li>
                 <li><strong>사이트 권한</strong>을 탭하세요</li>
                 <li><strong>마이크</strong> 항목을 <strong>허용</strong>으로 변경하세요</li>
                 <li>페이지를 새로고침하세요</li>
@@ -334,8 +342,8 @@
         <div id="genericSteps" style="display:none;">
             <p>마이크 권한 허용하기:</p>
             <ol class="steps">
-                <li>브라우저 주소창 근처의 권한 아이콘을 찾으세요 (보통 자물쇠 모양)</li>
-                <li>사이트 설정 또는 권한 메뉴로 이동하세요</li>
+                <li>브라우저 메뉴 버튼을 찾아 탭하세요</li>
+                <li>설정 또는 사이트 설정으로 이동하세요</li>
                 <li>마이크 접근을 허용으로 변경하세요</li>
                 <li>페이지를 새로고침하세요</li>
             </ol>
@@ -358,7 +366,7 @@
         let recognition = null;
         let isRecognizing = false;
         let micPermissionGranted = false;
-        const FIXED_CODE = "1234"; // 고정 코드
+        let roomCode = "";
         
         // 요소 참조
         const setupDiv = document.getElementById('setup');
@@ -377,12 +385,19 @@
         const textControls = document.getElementById('textControls');
         const micPermissionBox = document.getElementById('micPermissionBox');
         const browserDetection = document.getElementById('browserDetection');
+        const easyCodeDisplay = document.getElementById('easyCode');
+        const permissionButtonDiv = document.getElementById('permissionButtonDiv');
         const codeBoxes = [
             document.getElementById('code1'),
             document.getElementById('code2'),
             document.getElementById('code3'),
             document.getElementById('code4')
         ];
+        
+        // 랜덤 4자리 코드 생성 함수
+        function generateRandomCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
         
         // 코드 입력 자동 이동 설정
         function setupCodeInputs() {
@@ -391,6 +406,9 @@
                     if (this.value.length === this.maxLength) {
                         if (i < codeBoxes.length - 1) {
                             codeBoxes[i + 1].focus();
+                        } else {
+                            // 마지막 코드 입력 후 연결 버튼에 포커스
+                            document.getElementById('connectBtn').focus();
                         }
                     }
                 });
@@ -407,7 +425,34 @@
         // 페이지 로드 시 초기화
         window.onload = function() {
             setupCodeInputs();
+            
+            // 페이지 접근 시 마이크 권한을 먼저 확인
+            permissionButtonDiv.style.display = 'block';
+            setupDiv.style.display = 'none';
         };
+        
+        // 권한 요청 버튼 처리
+        document.getElementById('startPermissionBtn').addEventListener('click', function() {
+            // 마이크 권한 직접 요청
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    // 성공 - 스트림 해제
+                    stream.getTracks().forEach(track => track.stop());
+                    // 메인 앱 로드
+                    micPermissionGranted = true;
+                    permissionButtonDiv.style.display = 'none';
+                    setupDiv.style.display = 'block';
+                })
+                .catch(function(err) {
+                    // 권한 거부 - 마이크 권한 안내 상자 표시
+                    permissionButtonDiv.style.display = 'none';
+                    micPermissionBox.style.display = 'block';
+                    detectBrowser();
+                    
+                    // 메인 화면도 함께 표시하여 계속 진행할 수 있게 함
+                    setupDiv.style.display = 'block';
+                });
+        });
         
         // 브라우저 감지
         function detectBrowser() {
@@ -449,10 +494,14 @@
             roomCodeDisplay.style.display = 'block';
             displayDiv.style.display = 'block';
             
+            // 랜덤 코드 생성
+            roomCode = generateRandomCode();
+            easyCodeDisplay.textContent = roomCode;
+            
             statusDiv.textContent = '연결 초기화 중...';
             
             // PeerJS 초기화
-            peer = new Peer(FIXED_CODE);
+            peer = new Peer(roomCode);
             
             peer.on('open', function(id) {
                 statusDiv.textContent = '연결 대기 중... 휴대폰에서 코드를 입력하세요.';
@@ -478,6 +527,11 @@
                 } else {
                     messageDiv.textContent = '오류: ' + err;
                 }
+                
+                // 오류 발생 시 새로운 코드로 재시도
+                setTimeout(function() {
+                    createRoom();
+                }, 1000);
             });
         }
         
@@ -517,15 +571,23 @@
                 
                 conn.on('open', function() {
                     // 마이크 권한 확인
-                    checkMicrophonePermission().then(function() {
-                        // 권한 있음
-                        micPermissionGranted = true;
+                    if (micPermissionGranted) {
+                        // 이미 권한이 있음
                         showVoiceInterface();
-                    }).catch(function() {
-                        // 권한 없음
-                        micPermissionBox.style.display = 'block';
-                        detectBrowser();
-                    });
+                    } else {
+                        checkMicrophonePermission().then(function() {
+                            // 권한 있음
+                            micPermissionGranted = true;
+                            showVoiceInterface();
+                        }).catch(function() {
+                            // 권한 없음
+                            micPermissionBox.style.display = 'block';
+                            detectBrowser();
+                            // 텍스트 모드로 전환
+                            switchToText();
+                            senderControlsDiv.style.display = 'block';
+                        });
+                    }
                 });
                 
                 conn.on('error', function(err) {
@@ -631,7 +693,7 @@
                     } else {
                         messageDiv.textContent = '음성 인식 오류: ' + event.error;
                     }
-                    isRecognizing = false;
+                   isRecognizing = false;
                     recordingIndicator.style.display = 'none';
                 };
                 
