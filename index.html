@@ -1,0 +1,47 @@
+// 음성 모드로 전환
+        function switchToVoice() {
+            voiceToggle.classList.add('active');
+            textToggle.classList.remove('active');
+            voiceControls.style.display = 'block';
+            textControls.style.display = 'none';
+            
+            // 마이크 권한 확인
+            if (!micPermissionGranted) {
+                checkMicrophonePermission().then(function() {
+                    micPermissionGranted = true;
+                    micPermissionBox.style.display = 'none';
+                    
+                    if (!recognition) {
+                        initSpeechRecognition();
+                    }
+                }).catch(function() {
+                    micPermissionBox.style.display = 'block';
+                    detectBrowser();
+                });
+            }
+        }
+        
+        // 텍스트 모드로 전환
+        function switchToText() {
+            voiceToggle.classList.remove('active');
+            textToggle.classList.add('active');
+            voiceControls.style.display = 'none';
+            textControls.style.display = 'block';
+            micPermissionBox.style.display = 'none';
+            
+            // 음성 인식 중지
+            if (recognition && isRecognizing) {
+                stopVoiceRecognition();
+            }
+        }
+        
+        // 엔터키로 텍스트 전송
+        textInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendText();
+            }
+        });
+    </script>
+</body>
+</html>
