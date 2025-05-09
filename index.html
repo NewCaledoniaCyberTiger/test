@@ -1,4 +1,718 @@
-// 음성 모드로 전환
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>음성 인식 메시지 전송</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            margin: 0;
+            padding: 16px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            touch-action: manipulation;
+            min-width: 150px;
+        }
+        .btn:active {
+            background-color: #3367d6;
+        }
+        .btn-green {
+            background-color: #34a853;
+        }
+        .btn-green:active {
+            background-color: #2e7d32;
+        }
+        .btn-red {
+            background-color: #ea4335;
+        }
+        .btn-red:active {
+            background-color: #c62828;
+        }
+        .input-box {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        #textInput {
+            height: 100px;
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: none;
+        }
+        #receivedText {
+            font-size: 40px;
+            padding: 20px;
+            min-height: 250px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #roomCode {
+            font-size: 32px;
+            font-weight: bold;
+            padding: 15px;
+            background-color: #f1f8ff;
+            border: 2px dashed #4285f4;
+            display: inline-block;
+            margin: 15px;
+            border-radius: 8px;
+        }
+        #recordingIndicator {
+            display: none;
+            color: #34a853;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 15px 0;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        .toggle-container {
+            display: flex;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 300px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .toggle-btn.active {
+            background-color: #4285f4;
+            color: white;
+        }
+        .quick-text {
+            display: inline-block;
+            background-color: #e8f0fe;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid #d2e3fc;
+            font-size: 16px;
+        }
+        .quick-text:active {
+            background-color: #d2e3fc;
+        }
+        #micPermissionBox {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            display: none;
+        }
+        #micPermissionBox h3 {
+            color: #c62828;
+            margin-top: 0;
+        }
+        #micPermissionBox p {
+            margin: 10px 0;
+        }
+        .steps {
+            text-align: left;
+            padding-left: 20px;
+        }
+        .steps li {
+            margin-bottom: 10px;
+        }
+        .steps img {
+            max-width: 100%;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .highlight {
+            background-color: #fff9c4;
+            padding: 3px;
+        }
+        #browserDetection {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #status {
+            color: #666;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        #message {
+            color: #d32f2f;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        .code-input {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .code-box {
+            width: 50px;
+            height: 60px;
+            margin: 0 5px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #4285f4;
+            border-radius: 8px;
+        }
+        #easyCode {
+            font-size: 48px;
+            font-weight: bold;
+            color: #4285f4;
+            letter-spacing: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="setup" class="section">
+        <h1>음성 인식 메시지 전송 시스템</h1>
+        <div style="margin: 20px 0;">
+            <button id="createBtn" class="btn" onclick="createRoom()">화면 표시 모드<br>(컴퓨터)</button>
+            <button id="joinBtn" class="btn" onclick="showJoinForm()">음성 입력 모드<br>(휴대폰)</button>
+        </div>
+    </div>
+    
+    <div id="roomCodeDisplay" class="section" style="display:none;">
+        <h1>간편 코드</h1>
+        <div id="easyCode">1234</div>
+        <p>이 코드를 휴대폰에 입력하세요</p>
+    </div>
+    
+    <div id="joinRoom" class="section" style="display:none;">
+        <h1>코드 입력</h1>
+        <div class="code-input">
+            <input type="text" maxlength="1" class="code-box" id="code1" inputmode="numeric" />
+            <input type="text" maxlength="1" class="code-box" id="code2" inputmode="numeric" />
+            <input type="text" maxlength="1" class="code-box" id="code3" inputmode="numeric" />
+            <input type="text" maxlength="1" class="code-box" id="code4" inputmode="numeric" />
+        </div>
+        <button id="connectBtn" class="btn" onclick="joinRoom()">연결</button>
+    </div>
+    
+    <div id="display" class="section" style="display:none;">
+        <h1>수신된 메시지</h1>
+        <div id="receivedText"></div>
+        <button id="clearDisplayBtn" class="btn" onclick="clearDisplay()">화면 지우기</button>
+    </div>
+    
+    <div id="senderControls" class="section" style="display:none;">
+        <h1>메시지 입력</h1>
+        
+        <div class="toggle-container">
+            <button id="voiceToggle" class="toggle-btn active" onclick="switchToVoice()">음성 인식</button>
+            <button id="textToggle" class="toggle-btn" onclick="switchToText()">텍스트 입력</button>
+        </div>
+        
+        <div id="voiceControls">
+            <p>버튼을 누르고 말하세요</p>
+            <button id="startBtn" class="btn btn-green" onclick="startVoiceRecognition()">음성 인식 시작</button>
+            <button id="stopBtn" class="btn btn-red" onclick="stopVoiceRecognition()">중지</button>
+            <div id="recordingIndicator">● 녹음 중...</div>
+        </div>
+        
+        <div id="textControls" style="display:none;">
+            <textarea id="textInput" placeholder="전송할 메시지 입력..."></textarea>
+            <button id="sendTextBtn" class="btn" onclick="sendText()">전송</button>
+            
+            <h3>자주 쓰는 문구</h3>
+            <div>
+                <div class="quick-text" onclick="useQuickText(this)">회의를 시작하겠습니다</div>
+                <div class="quick-text" onclick="useQuickText(this)">잠시만 기다려주세요</div>
+                <div class="quick-text" onclick="useQuickText(this)">질문 있으신가요?</div>
+                <div class="quick-text" onclick="useQuickText(this)">회의를 마치겠습니다</div>
+                <div class="quick-text" onclick="useQuickText(this)">감사합니다</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="micPermissionBox">
+        <h3>⚠️ 마이크 권한이 필요합니다</h3>
+        <div id="browserDetection"></div>
+        
+        <div id="chromeSteps" style="display:none;">
+            <p>Chrome에서 마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
+                <li>메뉴에서 <strong>사이트 설정</strong>을 탭하세요</li>
+                <li><strong>마이크</strong> 항목을 찾아 <strong>허용</strong>으로 변경하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <div id="safariSteps" style="display:none;">
+            <p>Safari에서 마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li><strong>설정</strong> 앱을 열고 <strong>Safari</strong>를 찾으세요</li>
+                <li><strong>카메라 및 마이크 접근</strong>을 허용하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <div id="firefoxSteps" style="display:none;">
+            <p>Firefox에서 마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
+                <li><strong>더 보기</strong>를 탭하고 <strong>권한</strong>을 선택하세요</li>
+                <li><strong>마이크</strong> 옵션을 <strong>허용</strong>으로 변경하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <div id="samsungSteps" style="display:none;">
+            <p>Samsung 인터넷에서 마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li>주소창 오른쪽의 <strong>⋮</strong> 메뉴를 탭하세요</li>
+                <li><strong>설정</strong>을 탭하고 <strong>사이트 및 앱 설정</strong>을 선택하세요</li>
+                <li><strong>마이크</strong>를 탭하고 이 사이트를 허용으로 설정하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <div id="edgeSteps" style="display:none;">
+            <p>Edge에서 마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li>주소창 왼쪽의 <strong>🔒 자물쇠</strong> 아이콘을 탭하세요</li>
+                <li><strong>사이트 권한</strong>을 탭하세요</li>
+                <li><strong>마이크</strong> 항목을 <strong>허용</strong>으로 변경하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <div id="genericSteps" style="display:none;">
+            <p>마이크 권한 허용하기:</p>
+            <ol class="steps">
+                <li>브라우저 주소창 근처의 권한 아이콘을 찾으세요 (보통 자물쇠 모양)</li>
+                <li>사이트 설정 또는 권한 메뉴로 이동하세요</li>
+                <li>마이크 접근을 허용으로 변경하세요</li>
+                <li>페이지를 새로고침하세요</li>
+            </ol>
+        </div>
+        
+        <button class="btn" onclick="requestMicPermission()">마이크 권한 다시 요청</button>
+        <button class="btn" onclick="reloadPage()">페이지 새로고침</button>
+        <button class="btn" onclick="switchToText()">텍스트 모드로 계속</button>
+    </div>
+    
+    <div id="status"></div>
+    <div id="message"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script>
+        // 전역 변수
+        let peer = null;
+        let conn = null;
+        let isHost = false;
+        let recognition = null;
+        let isRecognizing = false;
+        let micPermissionGranted = false;
+        const FIXED_CODE = "1234"; // 고정 코드
+        
+        // 요소 참조
+        const setupDiv = document.getElementById('setup');
+        const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+        const joinRoomDiv = document.getElementById('joinRoom');
+        const senderControlsDiv = document.getElementById('senderControls');
+        const displayDiv = document.getElementById('display');
+        const textInput = document.getElementById('textInput');
+        const receivedText = document.getElementById('receivedText');
+        const statusDiv = document.getElementById('status');
+        const messageDiv = document.getElementById('message');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const voiceToggle = document.getElementById('voiceToggle');
+        const textToggle = document.getElementById('textToggle');
+        const voiceControls = document.getElementById('voiceControls');
+        const textControls = document.getElementById('textControls');
+        const micPermissionBox = document.getElementById('micPermissionBox');
+        const browserDetection = document.getElementById('browserDetection');
+        const codeBoxes = [
+            document.getElementById('code1'),
+            document.getElementById('code2'),
+            document.getElementById('code3'),
+            document.getElementById('code4')
+        ];
+        
+        // 코드 입력 자동 이동 설정
+        function setupCodeInputs() {
+            for (let i = 0; i < codeBoxes.length; i++) {
+                codeBoxes[i].addEventListener('input', function() {
+                    if (this.value.length === this.maxLength) {
+                        if (i < codeBoxes.length - 1) {
+                            codeBoxes[i + 1].focus();
+                        }
+                    }
+                });
+                
+                codeBoxes[i].addEventListener('keydown', function(e) {
+                    // 백스페이스 처리
+                    if (e.key === 'Backspace' && i > 0 && this.value === '') {
+                        codeBoxes[i - 1].focus();
+                    }
+                });
+            }
+        }
+        
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            setupCodeInputs();
+        };
+        
+        // 브라우저 감지
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            let browserName = "기타 브라우저";
+            let browserIcon = "";
+            
+            if (ua.match(/chrome|chromium|crios/i)) {
+                browserName = "Chrome";
+                browserIcon = "🌐";
+                document.getElementById('chromeSteps').style.display = 'block';
+            } else if (ua.match(/firefox|fxios/i)) {
+                browserName = "Firefox";
+                browserIcon = "🦊";
+                document.getElementById('firefoxSteps').style.display = 'block';
+            } else if (ua.match(/safari/i)) {
+                browserName = "Safari";
+                browserIcon = "🧭";
+                document.getElementById('safariSteps').style.display = 'block';
+            } else if (ua.match(/edg/i)) {
+                browserName = "Edge";
+                browserIcon = "🌐";
+                document.getElementById('edgeSteps').style.display = 'block';
+            } else if (ua.match(/samsungbrowser/i)) {
+                browserName = "Samsung 인터넷";
+                browserIcon = "🌐";
+                document.getElementById('samsungSteps').style.display = 'block';
+            } else {
+                document.getElementById('genericSteps').style.display = 'block';
+            }
+            
+            browserDetection.innerHTML = `감지된 브라우저: ${browserIcon} ${browserName}`;
+        }
+        
+        // 방 만들기 (컴퓨터 측)
+        function createRoom() {
+            isHost = true;
+            setupDiv.style.display = 'none';
+            roomCodeDisplay.style.display = 'block';
+            displayDiv.style.display = 'block';
+            
+            statusDiv.textContent = '연결 초기화 중...';
+            
+            // PeerJS 초기화
+            peer = new Peer(FIXED_CODE);
+            
+            peer.on('open', function(id) {
+                statusDiv.textContent = '연결 대기 중... 휴대폰에서 코드를 입력하세요.';
+            });
+            
+            peer.on('connection', function(connection) {
+                conn = connection;
+                statusDiv.textContent = '연결됨!';
+                
+                conn.on('data', function(data) {
+                    receivedText.textContent = data;
+                });
+                
+                conn.on('close', function() {
+                    statusDiv.textContent = '연결이 끊어졌습니다.';
+                });
+            });
+            
+            peer.on('error', function(err) {
+                if (err.type === 'unavailable-id') {
+                    messageDiv.textContent = '다른 컴퓨터가 이미 사용 중입니다. 새로고침 후 다시 시도하세요.';
+                    peer.destroy();
+                } else {
+                    messageDiv.textContent = '오류: ' + err;
+                }
+            });
+        }
+        
+        // 방 참여 폼 표시
+        function showJoinForm() {
+            isHost = false;
+            setupDiv.style.display = 'none';
+            joinRoomDiv.style.display = 'block';
+            
+            // 첫 번째 코드 입력란에 포커스
+            setTimeout(function() {
+                codeBoxes[0].focus();
+            }, 100);
+        }
+        
+        // 방 참여하기 (휴대폰 측)
+        function joinRoom() {
+            // 코드 상자에서 숫자 가져오기
+            let code = '';
+            for (let i = 0; i < codeBoxes.length; i++) {
+                code += codeBoxes[i].value;
+            }
+            
+            if (code.length !== 4) {
+                messageDiv.textContent = '4자리 코드를 모두 입력하세요.';
+                return;
+            }
+            
+            joinRoomDiv.style.display = 'none';
+            statusDiv.textContent = '연결 중...';
+            
+            // PeerJS 초기화
+            peer = new Peer();
+            
+            peer.on('open', function(id) {
+                conn = peer.connect(code);
+                
+                conn.on('open', function() {
+                    // 마이크 권한 확인
+                    checkMicrophonePermission().then(function() {
+                        // 권한 있음
+                        micPermissionGranted = true;
+                        showVoiceInterface();
+                    }).catch(function() {
+                        // 권한 없음
+                        micPermissionBox.style.display = 'block';
+                        detectBrowser();
+                    });
+                });
+                
+                conn.on('error', function(err) {
+                    messageDiv.textContent = '연결 오류: ' + err;
+                });
+            });
+            
+            peer.on('error', function(err) {
+                if (err.type === 'peer-unavailable') {
+                    messageDiv.textContent = '연결할 수 없습니다. 코드가 올바른지, 컴퓨터가 준비되어 있는지 확인하세요.';
+                } else {
+                    messageDiv.textContent = '오류: ' + err;
+                }
+            });
+        }
+        
+        // 음성 인터페이스 표시
+        function showVoiceInterface() {
+            senderControlsDiv.style.display = 'block';
+            micPermissionBox.style.display = 'none';
+            statusDiv.textContent = '연결됨! 음성 인식 버튼을 눌러 말하세요.';
+            
+            // 음성 인식 초기화
+            initSpeechRecognition();
+        }
+        
+        // 마이크 권한 확인
+        function checkMicrophonePermission() {
+            return new Promise((resolve, reject) => {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        // 스트림 해제
+                        stream.getTracks().forEach(track => track.stop());
+                        resolve();
+                    })
+                    .catch(function(err) {
+                        reject(err);
+                    });
+            });
+        }
+        
+        // 마이크 권한 요청
+        function requestMicPermission() {
+            checkMicrophonePermission().then(function() {
+                micPermissionGranted = true;
+                showVoiceInterface();
+            }).catch(function(err) {
+                messageDiv.textContent = '마이크 권한을 허용할 수 없습니다. 브라우저 설정을 확인해주세요.';
+                
+                // 마이크 권한 설정 안내 계속 표시
+                micPermissionBox.style.display = 'block';
+                detectBrowser();
+            });
+        }
+        
+        // 페이지 새로고침
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+        // 음성 인식 초기화
+        function initSpeechRecognition() {
+            try {
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (!window.SpeechRecognition) {
+                    messageDiv.innerHTML = '이 브라우저는 음성 인식을 지원하지 않습니다.<br>텍스트 입력 모드로 전환합니다.';
+                    switchToText();
+                    return false;
+                }
+                
+                recognition = new window.SpeechRecognition();
+                recognition.lang = 'ko-KR';
+                recognition.interimResults = false;
+                recognition.continuous = false;
+                recognition.maxAlternatives = 1;
+                
+                recognition.onstart = function() {
+                    isRecognizing = true;
+                    recordingIndicator.style.display = 'block';
+                    statusDiv.textContent = '듣는 중...';
+                    messageDiv.textContent = '';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    statusDiv.textContent = '인식된 텍스트: ' + transcript;
+                    
+                    if (conn && conn.open) {
+                        conn.send(transcript);
+                        statusDiv.textContent = '전송 완료: ' + transcript;
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed') {
+                        micPermissionGranted = false;
+                        messageDiv.innerHTML = '<strong>마이크 액세스가 거부되었습니다.</strong><br>브라우저 설정에서 마이크 권한을 허용해주세요.';
+                        micPermissionBox.style.display = 'block';
+                        detectBrowser();
+                    } else if (event.error === 'no-speech') {
+                        statusDiv.textContent = '음성이 감지되지 않았습니다. 다시 시도하세요.';
+                    } else {
+                        messageDiv.textContent = '음성 인식 오류: ' + event.error;
+                    }
+                    isRecognizing = false;
+                    recordingIndicator.style.display = 'none';
+                };
+                
+                recognition.onend = function() {
+                    isRecognizing = false;
+                    recordingIndicator.style.display = 'none';
+                    statusDiv.textContent = '음성 인식 종료. 다시 시작하려면 버튼을 누르세요.';
+                };
+                
+                return true;
+            } catch (e) {
+                messageDiv.innerHTML = '음성 인식 초기화 오류: ' + e.message + '<br>텍스트 입력 모드로 전환합니다.';
+                switchToText();
+                return false;
+            }
+        }
+        
+        // 음성 인식 시작
+        function startVoiceRecognition() {
+            if (isRecognizing) return;
+            
+            if (!recognition && !initSpeechRecognition()) {
+                switchToText();
+                return;
+            }
+            
+            messageDiv.textContent = '';
+            
+            try {
+                recognition.start();
+                statusDiv.textContent = '말하세요...';
+            } catch (e) {
+                messageDiv.textContent = '시작 오류: ' + e.message;
+            }
+        }
+        
+        // 음성 인식 중지
+        function stopVoiceRecognition() {
+            if (recognition && isRecognizing) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    messageDiv.textContent = '중지 오류: ' + e.message;
+                }
+            }
+        }
+        
+        // 텍스트 전송
+        function sendText() {
+            if (conn && conn.open) {
+                const text = textInput.value.trim();
+                if (text) {
+                    conn.send(text);
+                    statusDiv.textContent = '메시지 전송 완료!';
+                    textInput.value = '';
+                    textInput.focus();
+                } else {
+                    messageDiv.textContent = '전송할 메시지를 입력하세요.';
+                }
+            } else {
+                messageDiv.textContent = '연결이 되어있지 않습니다.';
+            }
+        }
+        
+        // 화면 지우기
+        function clearDisplay() {
+            receivedText.textContent = '';
+        }
+        
+        // 빠른 문구 사용
+        function useQuickText(element) {
+            const text = element.textContent;
+            if (conn && conn.open) {
+                conn.send(text);
+                statusDiv.textContent = '메시지 전송 완료!';
+            } else {
+                messageDiv.textContent = '연결이 되어있지 않습니다.';
+            }
+        }
+        
+        // 음성 모드로 전환
         function switchToVoice() {
             voiceToggle.classList.add('active');
             textToggle.classList.remove('active');
